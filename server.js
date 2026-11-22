@@ -20,21 +20,32 @@ const redirect=(res,to,headers={})=>send(res,302,'', 'text/plain',{'Location':to
 const html=(res,name,replace={})=>{let s=pages[name];for(const [k,v] of Object.entries(replace))s=s.replaceAll(k,v);send(res,200,s)};
 const emailOK=s=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)&&s.length<=254;
 function authPage(res,mode,error='',notice=''){const signup=mode==='signup',forgot=mode==='forgot';const heading=signup?'Create your account':forgot?'Password assistance':'Welcome back';const sub=signup?'Join SmogMission using your email address.':forgot?'Password recovery is not enabled in this local demo. Create a new account or contact the project owner.':'Sign in to continue to your SmogMission dashboard.';const form=forgot?'':`<form method="post" action="/${mode}"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="${signup?'new-password':'current-password'}" minlength="${signup?12:1}" maxlength="128" required><button type="submit">${signup?'Create account':'Sign in'}</button></form>`;send(res,200,`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SmogMission | ${heading}</title><style>:root{font-family:Inter,system-ui,Segoe UI,sans-serif;color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 10%,#164b59 0,transparent 48%),radial-gradient(ellipse at 85% 85%,#182b60 0,transparent 50%),#071421;color:#f4f8ff;display:grid;place-items:center;padding:24px}.wrap{display:grid;grid-template-columns:1fr 1fr;max-width:960px;width:100%;min-height:540px;border:1px solid #395164;border-radius:26px;overflow:hidden;box-shadow:0 32px 90px #0006}.hero{background:linear-gradient(145deg,#0a3341,#102039);padding:55px 45px;display:flex;flex-direction:column;justify-content:center}.eyebrow{color:#7af1d7;font-size:12px;font-weight:800;letter-spacing:2px}h1{font-size:clamp(38px,5vw,58px);letter-spacing:-2px}.hero p{color:#b6ced8;line-height:1.7}.features{margin-top:28px;display:grid;gap:12px;color:#d8e9ed;font-size:14px}.panel{background:#0c1a2c;padding:48px 44px;display:flex;flex-direction:column;justify-content:center}h2{font-size:27px}.sub{color:#a7baca;line-height:1.6}label{display:block;margin:16px 0 8px}input{width:100%;background:#101f33;border:1px solid #466078;border-radius:10px;padding:14px;color:white;font:inherit}button{border:0;background:#76e6d0;color:#082630;border-radius:10px;padding:14px;font:inherit;font-weight:800;cursor:pointer;width:100%;margin-top:23px}a{color:#86ead7}.links{margin-top:24px;display:flex;justify-content:space-between;gap:10px}.alert{color:#ffd9d9}.notice{color:#c9fff2}@media(max-width:740px){.wrap{grid-template-columns:1fr}.hero,.panel{padding:30px}.features{display:none}}</style><div class="wrap"><section class="hero"><div class="eyebrow">PROMPTWARS · CHALLENGE 6</div><h1>SmogMission<span style="color:#7af1d7">.</span></h1><p>One secure account. Two experiences. Explore AI-powered air-quality insights and design your own Earth-observation mission.</p><div class="features"><div>◉ SmogGuide — Personalized air-quality guidance</div><div>◉ MissionCraft — Space mission simulation</div><div>◉ Local account and protected access</div></div></section><main class="panel"><h2>${heading}</h2><p class="sub">${sub}</p>${error?`<p class="alert" role="alert">${esc(error)}</p>`:''}${notice?`<p class="notice">${esc(notice)}</p>`:''}${form}<div class="links"><a href="/login">Sign in</a><a href="/signup">Create account</a><a href="/forgot">Password help</a></div><p class="sub">Local development authentication. No Supabase or email OTP required.</p></main></div></html>`)}
+
 function originOK(req) {
   const source = req.headers.origin || req.headers.referer;
-  if (!source) return false;
+
+  if (!source) {
+    return false;
+  }
 
   try {
-    const actualOrigin = new URL(source).origin;
+    const submittedOrigin = new URL(source).origin;
+    const configured = process.env.APP_ORIGIN;
 
-    const allowedOrigins = [
-      process.env.APP_ORIGIN,
-      "http://localhost:5000"
-    ].filter(Boolean).map(value => new URL(value).origin);
+    // Production must explicitly configure its trusted origin.
+    const allowed = configured
+      ? new URL(configured).origin
+      : (
+          process.env.VERCEL
+            ? null
+            : `http://localhost:${PORT}`
+        );
 
-    return allowedOrigins.includes(actualOrigin);
+    return allowed !== null && submittedOrigin === allowed;
   } catch {
     return false;
+  }
+}
   }
 }
 async function body(req){let size=0,chunks=[];for await(const c of req){size+=c.length;if(size>12000)throw Error('Request too large');chunks.push(c)}const raw=Buffer.concat(chunks).toString();if((req.headers['content-type']||'').includes('application/json'))return JSON.parse(raw||'{}');return Object.fromEntries(new URLSearchParams(raw))}
