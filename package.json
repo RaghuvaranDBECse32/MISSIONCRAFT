@@ -1,1 +1,1 @@
-{"name":"smogmission-js","version":"1.0.1","private":true,"scripts":{"start":"node server.js","test":"node --test smoke.test.js"},"engines":{"node":"24.x"}}
+{"name":"smogmission-public","version":"1.0.0","private":true,"scripts":{"start":"node server.js","test":"node --check server.js"},"engines":{"node":">=22"}}

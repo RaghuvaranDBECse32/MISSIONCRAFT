@@ -1,7 +1,5 @@
-# SmogMission / MISSIONCRAFT JavaScript Edition
+# SmogMission Public Site
 
-Node.js app combining SmogGuide and MissionCraft. Local: `npm start`, `npm test`. Requires Node 24.x.
+No signup, login, sessions or SQLite database. Public landing page and SmogGuide/MissionCraft experiences.
 
-For Vercel, set `APP_ORIGIN=https://mc-eta-gilt.vercel.app`.
-
-**Temporary demo only:** Vercel SQLite `/tmp` is ephemeral and not shared across instances. Signups, sessions, community messages and tickets are NOT reliable or durable. Do not collect real user information until migrating to hosted persistent storage. Remove committed SQLite files from Git and prior public deployments.
+Deploy these files at the repository root. On Vercel, use a supported Node.js runtime. Optional GEMINI_API_KEY for AI guidance.
