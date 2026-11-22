@@ -1,0 +1,3 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const {server}=require('../server');
+test('health and unauthenticated protection',async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));try{const base=`http://127.0.0.1:${server.address().port}`;const h=await fetch(base+'/health');assert.equal(h.status,200);assert.equal((await h.json()).status,'ok');const a=await fetch(base+'/api/community/messages');assert.equal(a.status,401);const s=await fetch(base+'/signup');assert.equal(s.status,200);assert.match(await s.text(),/Create your account/)}finally{await new Promise(r=>server.close(r))}});

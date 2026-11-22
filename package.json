@@ -1,8 +1,1 @@
-{
-  "name": "missioncraft-launch-lab",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "vercel dev"
-  }
-}
+{"name":"smogmission-js","version":"1.0.0","private":true,"description":"SmogMission Challenge 6 JavaScript backend","scripts":{"start":"node server.js","test":"node --test tests/*.test.js"},"engines":{"node":">=22.13.0"}}
